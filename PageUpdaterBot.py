@@ -2,7 +2,7 @@
 # @Date:   2016-03-24T14:18:19+01:00
 # @Email:  axel.ursc@gmail.com
 # @Last modified by:   Awowen
-# @Last modified time: 2016-04-05T13:47:37+02:00
+# @Last modified time: 2016-04-05T14:47:13+02:00
 
 
 # -*- coding: utf-8 -*-
@@ -13,6 +13,7 @@ Bot qui surveille toutes les nouvelles entrées biographiques et met à jour les
 
 import urllib2
 import requests
+from bs4 import BeautifulSoup
 
 ############# Création des parametre ##########################
 
@@ -32,11 +33,19 @@ login_token=r1.json()['login']['token']
 login_params2=login_params+'&lgtoken=%s'% login_token
 r2=requests.post(baseurl+'api.php'+login_params2,cookies=r1.cookies)
 
-# TODO
-"""
-Go on a random page or
-Check a log of changes on the wikipast page http://wikipast.world/wiki/index.php?title=Spécial:Modifications_récentes&days=30&from=&limit=250
-"""
+baseurl = 'http://wikipast.world/wiki/'
+names = []
+with open('listofpages.txt') as f:
+    names = names + [f.readlines()]
+
+for name in names:
+    result=requests.post(baseurl+'api.php?action=query&titles='+name+'&export&exportnowrap')
+    soup=BeautifulSoup(result.text)
+    code=''
+    for primitive in soup.findAll("text"):
+        code+=primitive.string
+    print(code)
+
 # TODO
 """
 Click on every link
